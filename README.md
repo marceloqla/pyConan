@@ -34,6 +34,11 @@ CONAN also requires an external software to filter the alignments. Please, downl
 * -e <0 or 1> - Include marginally conservation properties.
   * 0 - Consider only co-variation between amino acids.
   * 1 - Also include stereochemical and structural amino acids properties.
+* -a <0, 1, 2>- Anticorrelations calculation modes:
+  * 0 - Do not calculate
+  * 1 - Only for Communities
+  * 2 - Calculate all"
+* -seq <header>- Sequence correlation mode. Program dumps escores for each residue pair in a sequence. Header must not contain '>' for fasta msa.
 
 Use -h for access the Help text.
 
