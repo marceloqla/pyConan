@@ -1,54 +1,55 @@
+import shared_globals
 import os
 import conan_constants
 
 def sortedSizeSequences():
-    """
-    Sorts sequences in the global MSA var from size (from biggest to smallest)
-    """
-    global msa
+	"""
+	Sorts sequences in the global MSA var from size (from biggest to smallest)
+	"""
+	# global msa
 	new_seqs = []
 
-	for seqname,sequence in msa.items():
+	for seqname,sequence in shared_globals.msa.items():
 		new_seq = sequence.replace('.','').replace('-','')
 		new_seqs.append((seqname,new_seq))
 
 	new_seqs = sorted(new_seqs,key=lambda x: len(x[1]),reverse=True)
 	return new_seqs
 
-def writeUnalignedFasta(fname="unaligned.fa", check=False):
-    """
-    From global MSA var, writes unaligned fasta file with name defined in fname variable (default: 'unaligned.fa')
-    Input variable check verifies for existance of the fname variable named file before creating a new one
-    """
-    global msa
+def writeUnalignedFasta(fname="unaligned.fa",outputdir="/", check=False):
+	"""
+	From global MSA var, writes unaligned fasta file with name defined in fname variable (default: 'unaligned.fa')
+	Input variable check verifies for existance of the fname variable named file before creating a new one
+	"""
+	# global msa
 	unal_file = outputdir + "/" + fname
-    if check and os.path.exists(unal_file):
-            return unal_file
+	if check and os.path.exists(unal_file):
+			return unal_file
 	fw = open(unal_file,'w')
-	for seqname,sequence in msa.items():
+	for seqname,sequence in shared_globals.msa.items():
 		fw.write('>' + seqname + "\n")
 		fw.write(sequence.replace('.','').replace('-','') + "\n")
 	fw.close()
 	return unal_file
 
-def maxIdCDhit(check=False):
-    """
-    Returns new multiple sequence alignment filtered by the cd-hit program
-    Cd-hit path should be defined in conan_constants.py
+def maxIdCDhit(check=False, outputdir="/"):
+	"""
+	Returns new multiple sequence alignment filtered by the cd-hit program
+	Cd-hit path should be defined in conan_constants.py
 
-    Input variable check verifies for the 'cluster' file existance in the output directory before running cd-hit
-    Before running Cd-hit, an unaligned fasta file is created (see above function)
-    Actual sequences are retrieved from MSA by the 'cluster' file indexation
-    """
-    global msa
-	unal_file = writeUnalignedFasta()
+	Input variable check verifies for the 'cluster' file existance in the output directory before running cd-hit
+	Before running Cd-hit, an unaligned fasta file is created (see above function)
+	Actual sequences are retrieved from MSA by the 'cluster' file indexation
+	"""
+	# global msa
+	unal_file = writeUnalignedFasta(outputdir=outputdir)
 	out_file = outputdir + "/cluster"
 	n = 5
-	if maxid > 0.7:
+	if shared_globals.maxid > 0.7:
 		n = 5
-	elif maxid > 0.6:
+	elif shared_globals.maxid > 0.6:
 		n = 4
-	elif maxid > 0.5:
+	elif shared_globals.maxid > 0.5:
 		n = 3
 	else:
 		n = 2
@@ -56,7 +57,7 @@ def maxIdCDhit(check=False):
 	# os.system('cd-hit -i ' + unal_file + ' -o ' + out_file + ' -c ' + str(maxid) + ' -n ' + str(n) + ' -M 3000 -T 2')
 
 	if (not check) or (check and os.path.exists(out_file) == False):
-        os.system(conan_constants.CD_HIT_PATH + ' -i ' + unal_file + ' -o ' + out_file + ' -c ' + str(maxid) + ' -n ' + str(n) + ' -M 3000 -T 2')
+		os.system(conan_constants.CD_HIT_PATH + ' -i ' + unal_file + ' -o ' + out_file + ' -c ' + str(shared_globals.maxid) + ' -n ' + str(n) + ' -M 3000 -T 2')
 
 	new_msa = {}
 	fr = open(out_file)
@@ -66,17 +67,17 @@ def maxIdCDhit(check=False):
 		if len(line) > 1:
 			if line[0] == '>':
 				seqname = line[1:]
-                #not retrieved from file but from msa
-				sequence = msa[seqname]
+				#not retrieved from file but from msa
+				sequence = shared_globals.msa[seqname]
 				new_msa[seqname] = sequence
 	fr.close()
 	return new_msa
 
 def aa2id(aa):
-    """
-    Converts Aminoacids ACDEFGHIKLMNPQRSTVWY to indexa 0-19 and gaps -. to 20
-    All else becomes index 21
-    """
+	"""
+	Converts Aminoacids ACDEFGHIKLMNPQRSTVWY to indexa 0-19 and gaps -. to 20
+	All else becomes index 21
+	"""
 	aa = aa.upper()
 	if aa == 'A':
 		return 0
@@ -126,9 +127,9 @@ def aa2id(aa):
 		return 21
 
 def readFasta(inputfile):
-    """
-    Read Fasta formatted MSA file, outputs dict with header : sequence
-    """
+	"""
+	Read Fasta formatted MSA file, outputs dict with header : sequence
+	"""
 	msa = {}
 	fr = open(inputfile,'r')
 	header = None
@@ -152,9 +153,9 @@ def readFasta(inputfile):
 	return msa
 
 def readStockholm(inputfile):
-    """
-    Read Pfam/Stockholm formatted MSA file, outputs dict with header : sequence
-    """
+	"""
+	Read Pfam/Stockholm formatted MSA file, outputs dict with header : sequence
+	"""
 	msa = {}
 	fr = open(inputfile,'r')
 

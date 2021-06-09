@@ -1,6 +1,7 @@
+import shared_globals
+
 def isHMM():
-    global msa
-	for name,sequence in msa.items():
+	for name,sequence in shared_globals.msa.items():
 		if '.' in sequence:
 			return True
 	return False	

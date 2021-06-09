@@ -1,0 +1,9 @@
+msa = {}
+seqmode=False
+seqmutmode=False
+nodes = None
+marginal = 1
+minocc = 0.8
+maxid = 0.8
+minfreq = 0.05
+maxfreq = 0.95
